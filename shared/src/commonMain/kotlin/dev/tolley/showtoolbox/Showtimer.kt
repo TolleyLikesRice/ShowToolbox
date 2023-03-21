@@ -5,7 +5,6 @@ class Showtimer {
     private val platform: Platform = getPlatform()
 
     fun currentTimeText(): String {
-        return "Current Time:" +
-                "\n${Clock.System.now()}"
+        return "${Clock.System.now().toString().substring(11, 19)}"
     }
 }
