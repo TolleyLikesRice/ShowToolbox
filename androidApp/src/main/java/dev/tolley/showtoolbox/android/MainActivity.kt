@@ -5,7 +5,11 @@ import android.os.Handler
 import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Undo
 import androidx.compose.material3.*
 import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.runtime.Composable
@@ -20,6 +24,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import dev.tolley.showtoolbox.R
 import dev.tolley.showtoolbox.Showtimer
@@ -37,8 +42,16 @@ class MainActivity : ComponentActivity() {
         Font(R.font.inconsolata_extrabold, FontWeight.ExtraBold)
     )
 
+    // State
+    private var isHouseOpen: Boolean = false
+    private var haveClearance: Boolean = false
+
     // Changy on screen stuff
     val currentTime = mutableStateOf("??:??:??")
+    private val houseOpenButtonColor = mutableStateOf(Color(144, 194, 234, 0))
+    private val houseOpenButtonTextColor = mutableStateOf(Color(255, 255, 255, 255))
+    private val clearanceButtonColor = mutableStateOf(Color(144, 194, 234, 0))
+    private val clearanceButtonTextColor = mutableStateOf(Color(255, 255, 255, 255))
 
     // idk
     lateinit var mainHandler: Handler
@@ -49,6 +62,30 @@ class MainActivity : ComponentActivity() {
         override fun run() {
             currentTime.value = showtimer.currentTimeText()
             mainHandler.postDelayed(this, 100)
+        }
+    }
+
+    private fun houseOpen() {
+        if (!isHouseOpen) {
+            houseOpenButtonColor.value = Color(144, 194, 234, 255)
+            houseOpenButtonTextColor.value = Color(28, 27, 31, 255)
+            isHouseOpen = true
+        }
+    }
+
+    private fun undoHouseOpen() {
+        if (isHouseOpen) {
+            houseOpenButtonColor.value = Color(144, 194, 234, 0)
+            houseOpenButtonTextColor.value = Color(255, 255, 255, 255)
+            isHouseOpen = false
+        }
+    }
+
+    private fun clearance() {
+        if (!haveClearance) {
+            clearanceButtonColor.value = Color(230, 201, 126, 255)
+            clearanceButtonTextColor.value = Color(28, 27, 31, 255)
+            haveClearance = true
         }
     }
 
@@ -71,23 +108,51 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun ShowTimerView() {
         val currentTime by currentTime
+        val houseOpenButtonColor by houseOpenButtonColor
+        val houseOpenButtonTextColor by houseOpenButtonTextColor
+        val clearanceButtonColor by clearanceButtonColor
+        val clearanceButtonTextColor by clearanceButtonTextColor
 
         val configuration = LocalConfiguration.current
         val screenHeight = configuration.screenHeightDp
         val screenWidth = configuration.screenWidthDp
 
         Column(
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth(0.95f)
+            ) {
+                IconButton(onClick = { undoHouseOpen() }) {
+                    Icon(Icons.Outlined.Undo, contentDescription = "Localized description")
+                }
+                IconButton(onClick = { }) {
+                    Icon(Icons.Outlined.Settings, contentDescription = "Localized description")
+                }
+            }
+        }
+
+        Column(
             modifier = Modifier.height((screenHeight * 0.5).dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height((screenHeight * 0.5 * 0.1).dp))
+            Spacer(Modifier.height((screenHeight * 0.5 * 0.15).dp))
             Text(
-                text = "Show Name",
+                text = "The Hunchback of Notre Dame",
                 textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Light,
+                fontSize = 35.sp,
+                fontWeight = FontWeight.Medium,
+                lineHeight = (1.4f).em,
+                modifier = Modifier.fillMaxWidth(0.9f)
             )
+            Spacer(Modifier.height((screenHeight * 0.5 * 0.15).dp))
             Text(
                 text = "Current Time:",
                 textAlign = TextAlign.Center,
@@ -108,11 +173,12 @@ class MainActivity : ComponentActivity() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(Modifier.fillMaxHeight(0.5f * 0.05f))
-            Button(
-                onClick = fun() {
 
-                },
-                colors = buttonColors(Color(144, 194, 234, 255)),
+            // House Open
+            Button(
+                onClick = { houseOpen() },
+                colors = buttonColors(houseOpenButtonColor),
+                border = BorderStroke(4.dp, Color(144, 194, 234, 255)),
                 shape = CardDefaults.outlinedShape,
                 modifier = Modifier
                     .height((screenHeight * 0.5 * 0.2).dp)
@@ -120,18 +186,22 @@ class MainActivity : ComponentActivity() {
             ) {
                 Text(
                     text = "House Open",
-                    color = Color(28, 27, 31, 255),
+                    color = houseOpenButtonTextColor,
                     fontFamily = incosolataFamily,
                     fontWeight = FontWeight.Light,
                     fontSize = 30.sp,
                 )
             }
+
             Spacer(Modifier.height((screenHeight * 0.5 * 0.05).dp))
+
+            // Clearance
             Button(
                 onClick = fun() {
-
+                    clearance()
                 },
-                colors = buttonColors(Color(230, 201, 126, 255)),
+                colors = buttonColors(clearanceButtonColor),
+                border = BorderStroke(4.dp, Color(230, 201, 126, 255)),
                 shape = CardDefaults.outlinedShape,
                 modifier = Modifier
                     .height((screenHeight * 0.5 * 0.2).dp)
@@ -139,7 +209,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 Text(
                     text = "Clearance",
-                    color = Color(28, 27, 31, 255),
+                    color = clearanceButtonTextColor,
                     fontFamily = incosolataFamily,
                     fontWeight = FontWeight.Light,
                     fontSize = 30.sp,
@@ -150,26 +220,20 @@ class MainActivity : ComponentActivity() {
                 onClick = fun() {
 
                 },
-                colors = buttonColors(Color(16, 201, 122, 255)),
+                colors = buttonColors(Color(16, 201, 122, 0)),
                 shape = CardDefaults.outlinedShape,
+                border = BorderStroke(4.dp, Color(16, 201, 122, 255)),
                 modifier = Modifier
                     .height((screenHeight * 0.5 * 0.4).dp)
                     .fillMaxWidth(0.9f)
             ) {
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Text(
+                    text = "Start Act 1",
+                    color = Color(255, 255, 255, 255),
+                    fontFamily = incosolataFamily,
+                    fontWeight = FontWeight.Light,
+                    fontSize = 30.sp
                 )
-                {
-                    Text(
-                        text = "Start Act 1",
-                        color = Color(28, 27, 31, 255),
-                        fontFamily = incosolataFamily,
-                        fontWeight = FontWeight.Light,
-                        fontSize = 30.sp,
-                    )
-                }
             }
             Spacer(Modifier.height((screenHeight * 0.5 * 0.1).dp))
         }
