@@ -3,7 +3,6 @@ package dev.tolley.showtoolbox.android
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.DisplayMetrics
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -20,7 +19,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.tolley.showtoolbox.R
@@ -29,7 +27,7 @@ import dev.tolley.showtoolbox.Showtimer
 class MainActivity : ComponentActivity() {
 
     // UI Stuff
-    val incosolataFamily = FontFamily(
+    private val incosolataFamily = FontFamily(
         Font(R.font.inconsolata_extralight, FontWeight.ExtraLight),
         Font(R.font.inconsolata_light, FontWeight.Light),
         Font(R.font.inconsolata_regular, FontWeight.Normal),
