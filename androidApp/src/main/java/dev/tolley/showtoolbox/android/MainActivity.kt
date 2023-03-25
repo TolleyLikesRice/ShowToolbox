@@ -21,7 +21,9 @@ class MainActivity : ComponentActivity() {
 
     private var showConfiguration = mutableMapOf<String, Any>(
         "name" to "The Hunchback of Notre Dame",
-        "isInterval" to true
+        "isInterval" to false,
+        "intervalDuration" to 20,
+        "acts" to 1
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,13 +56,16 @@ class MainActivity : ComponentActivity() {
             startDestination = startDestination
         ) {
             composable("showtimer-start") {
-                ShowTimerView1(
+                ShowTimerStartView(
                     navigateToAct1 = { navController.navigate("showtimer-act1") },
                     showConfiguration = showConfiguration
                 )
             }
             composable("showtimer-act1") {
-                ShowTimerView2(showConfiguration = showConfiguration)
+                ShowTimerAct1View(showConfiguration = showConfiguration, navigateToSummary = { navController.navigate("showtimer-summary") })
+            }
+            composable("showtimer-summary") {
+                ShowTimerSummaryView(showConfiguration = showConfiguration)
             }
         }
     }

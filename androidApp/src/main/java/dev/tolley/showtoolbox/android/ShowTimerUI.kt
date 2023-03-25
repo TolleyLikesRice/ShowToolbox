@@ -1,14 +1,16 @@
 package dev.tolley.showtoolbox.android
 
-import android.content.res.Configuration
+import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Undo
 import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults.elevatedCardColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -23,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import dev.tolley.showtoolbox.R
 import dev.tolley.showtoolbox.Showtimer
 
@@ -84,7 +88,7 @@ var lastAction: String = "none"
 
 private fun undo() {
     if (lastAction == "houseOpen") undoHouseOpen()
-    else if (lastAction == "clearance") undoClearance()
+    else if (lastAction == "act1Clearance") undoAct1Clearance()
 }
 
 private fun houseOpen() {
@@ -107,21 +111,21 @@ private fun undoHouseOpen() {
     }
 }
 
-private fun clearance() {
+private fun act1Clearance() {
     if (!haveClearance) {
         clearanceButtonColor.value = Color(230, 201, 126, 255)
         clearanceButtonTextColor.value = Color(28, 27, 31, 255)
         haveClearance = true
-        clearanceText.value = "Clearance\n${showtimer.record("clearance")}"
-        lastAction = "clearance"
+        clearanceText.value = "Clearance\n${showtimer.record("act1Clearance")}"
+        lastAction = "act1Clearance"
     }
 }
 
-private fun undoClearance() {
+private fun undoAct1Clearance() {
     clearanceButtonColor.value = Color(144, 194, 234, 0)
     clearanceButtonTextColor.value = Color(255, 255, 255, 255)
     clearanceText.value = "Clearance"
-    showtimer.deleteTime("clearance")
+    showtimer.deleteTime("act1Clearance")
     haveClearance = false
 }
 
@@ -133,7 +137,7 @@ private fun startAct1() {
 // --- Common Components ---
 
 @Composable
-private fun SettingsBar(screenHeight: Int) {
+private fun SettingsBar() {
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -141,7 +145,7 @@ private fun SettingsBar(screenHeight: Int) {
             .fillMaxWidth()
             .fillMaxHeight()
     ) {
-        Spacer(Modifier.height((screenHeight * 0.1 * 0.08).dp))
+        Spacer(Modifier.height(6.256.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -173,9 +177,8 @@ private fun SettingsBar(screenHeight: Int) {
 // --- Views ---
 
 @Composable
-fun ShowTimerView1(
+fun ShowTimerStartView(
     navigateToAct1: () -> Unit,
-    configuration: Configuration = LocalConfiguration.current,
     showConfiguration: MutableMap<String, Any>
 ) {
     val currentTime by currentTime
@@ -188,20 +191,18 @@ fun ShowTimerView1(
     val clearanceButtonTextColor by clearanceButtonTextColor
     val clearanceText by clearanceText
 
-    val screenHeight = configuration.screenHeightDp
-    val screenWidth = configuration.screenWidthDp
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
-        SettingsBar(screenHeight)
+        SettingsBar()
         Column(
             modifier = Modifier
-                .height((screenHeight * 0.5).dp)
+                .height(391.dp)
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height((screenHeight * 0.5 * 0.15).dp))
+            Spacer(Modifier.height(58.65.dp))
             Text(
                 text = showConfiguration["name"].toString(),
                 textAlign = TextAlign.Center,
@@ -210,7 +211,7 @@ fun ShowTimerView1(
                 lineHeight = (1.4f).em,
                 modifier = Modifier.fillMaxWidth(0.9f)
             )
-            Spacer(Modifier.height((screenHeight * 0.5 * 0.15).dp))
+            Spacer(Modifier.height(58.65.dp))
             Text(
                 text = "Current Time:",
                 textAlign = TextAlign.Center,
@@ -227,7 +228,7 @@ fun ShowTimerView1(
         }
         Column(
             modifier = Modifier
-                .height((screenHeight * 0.5).dp)
+                .height(391.dp)
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -241,7 +242,7 @@ fun ShowTimerView1(
                 border = BorderStroke(4.dp, Color(144, 194, 234, 255)),
                 shape = CardDefaults.outlinedShape,
                 modifier = Modifier
-                    .height((screenHeight * 0.5 * 0.2).dp)
+                    .height(78.2.dp)
                     .fillMaxWidth(0.9f)
             ) {
                 Text(
@@ -255,18 +256,18 @@ fun ShowTimerView1(
                 )
             }
 
-            Spacer(Modifier.height((screenHeight * 0.5 * 0.05).dp))
+            Spacer(Modifier.height(19.55.dp))
 
             // Clearance
             Button(
                 onClick = fun() {
-                    clearance()
+                    act1Clearance()
                 },
                 colors = ButtonDefaults.buttonColors(clearanceButtonColor),
                 border = BorderStroke(4.dp, Color(230, 201, 126, 255)),
                 shape = CardDefaults.outlinedShape,
                 modifier = Modifier
-                    .height((screenHeight * 0.5 * 0.2).dp)
+                    .height(78.2.dp)
                     .fillMaxWidth(0.9f)
             ) {
                 Text(
@@ -279,7 +280,7 @@ fun ShowTimerView1(
                     fontSize = 25.sp,
                 )
             }
-            Spacer(Modifier.height((screenHeight * 0.5 * 0.05).dp))
+            Spacer(Modifier.height(19.55.dp))
             Button(
                 onClick = fun() {
                     showtimer.record("act1Start")
@@ -289,7 +290,7 @@ fun ShowTimerView1(
                 shape = CardDefaults.outlinedShape,
                 border = BorderStroke(4.dp, Color(16, 201, 122, 255)),
                 modifier = Modifier
-                    .height((screenHeight * 0.5 * 0.4).dp)
+                    .height(156.4.dp)
                     .fillMaxWidth(0.9f)
             ) {
                 Text(
@@ -300,16 +301,15 @@ fun ShowTimerView1(
                     fontSize = 30.sp
                 )
             }
-            Spacer(Modifier.height((screenHeight * 0.5 * 0.1).dp))
+            Spacer(Modifier.height(39.1.dp))
         }
     }
 }
 
 
 @Composable
-fun ShowTimerView2(
-    //navigateToAct1: () -> Unit,
-    configuration: Configuration = LocalConfiguration.current,
+fun ShowTimerAct1View(
+    navigateToSummary: () -> Unit,
     showConfiguration: MutableMap<String, Any>
 ) {
     var endText = "????"
@@ -321,22 +321,19 @@ fun ShowTimerView2(
     val currentTime by currentTime
     val act1TimeElapsed by act1TimeElapsed
 
-    val screenHeight = configuration.screenHeightDp
-    val screenWidth = configuration.screenWidthDp
-
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
-        SettingsBar(screenHeight)
+        SettingsBar()
 
         Column(
             modifier = Modifier
-                .height((screenHeight * 0.75).dp)
+                .height(586.5.dp)
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height((screenHeight * 0.5 * 0.15).dp))
+            Spacer(Modifier.height(58.65.dp))
             Text(
                 text = "Current Time:",
                 textAlign = TextAlign.Center,
@@ -350,7 +347,7 @@ fun ShowTimerView2(
                 fontFamily = incosolataFamily,
                 fontWeight = FontWeight.Medium
             )
-            Spacer(Modifier.height((screenHeight * 0.75 * 0.13).dp))
+            Spacer(Modifier.height(50.83.dp))
             Text(
                 text = "Time Elapsed:",
                 textAlign = TextAlign.Center,
@@ -364,25 +361,29 @@ fun ShowTimerView2(
                 fontFamily = incosolataFamily,
                 fontWeight = FontWeight.Medium
             )
-            Spacer(Modifier.height((screenHeight * 0.3).dp))
+            Spacer(Modifier.height(234.6.dp))
         }
         Column(
             modifier = Modifier
-                .height((screenHeight * 0.25).dp)
+                .height(195.5.dp)
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height((screenHeight * 0.5 * 0.05).dp))
+            Spacer(Modifier.height(19.55.dp))
             Button(
                 onClick = fun() {
-                    //navigateToAct1()
+                    if (showConfiguration["acts"] == 1) {
+                        showtimer.record("act1End")
+                        navigateToSummary()
+                    }
+                    // TODO: Next act, no intervals - to interval, etc
                 },
                 colors = ButtonDefaults.buttonColors(Color(230, 100, 96, 0)),
                 shape = CardDefaults.outlinedShape,
                 border = BorderStroke(4.dp, Color(230, 100, 96, 255)),
                 modifier = Modifier
-                    .height((screenHeight * 0.5 * 0.4).dp)
+                    .height(156.4.dp)
                     .fillMaxWidth(0.9f)
             ) {
                 Text(
@@ -395,7 +396,247 @@ fun ShowTimerView2(
                     fontSize = 30.sp
                 )
             }
-            Spacer(Modifier.height((screenHeight * 0.5 * 0.1).dp))
+            Spacer(Modifier.height(39.1.dp))
         }
     }
 }
+
+@Composable
+fun ShowTimerSummaryView(
+    //navigateToSummary: () -> Unit,
+    showConfiguration: MutableMap<String, Any>
+) {
+
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+
+    Surface(
+        modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+    ) {
+        SettingsBar()
+
+        Column(
+            modifier = Modifier
+                .height(391.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(58.65.dp))
+            Text(
+                text = showConfiguration["name"].toString(),
+                textAlign = TextAlign.Center,
+                fontSize = 35.sp,
+                fontWeight = FontWeight.Medium,
+                lineHeight = (1.4f).em,
+                modifier = Modifier.fillMaxWidth(0.9f)
+            )
+            Spacer(Modifier.height(19.55.dp))
+            LazyColumn {
+
+                item {
+
+                    val sendIntent: Intent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, "This is my text to send.")
+                        type = "text/plain"
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+                    val context = LocalContext.current
+
+                    Button(
+                        onClick = {
+                            context.startActivity(shareIntent)
+                        },
+                        colors = ButtonDefaults.buttonColors(Color(230, 100, 96, 0)),
+                        shape = CardDefaults.outlinedShape,
+                        border = BorderStroke(4.dp, Color(56, 179, 164, 255)),
+                        modifier = Modifier
+                            .height(60.dp)
+                            .fillMaxWidth(0.9f)
+                    ) {
+                        Text(
+                            text = "Share",
+                            color = Color(255, 255, 255, 255),
+                            fontFamily = incosolataFamily,
+                            fontWeight = FontWeight.Light,
+                            lineHeight = (1.2f).em,
+                            textAlign = TextAlign.Center,
+                            fontSize = 30.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(15.dp))
+                }
+
+                item {
+                    ElevatedCard(
+                        modifier = Modifier
+                            .height(52.dp)
+                            .fillMaxWidth(0.9f),
+                        colors = elevatedCardColors(Color(79, 86, 96, 255))
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .width((screenWidth * 0.9 * 0.45).dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Summary",
+                                textAlign = TextAlign.Center,
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Medium,
+                                lineHeight = (1.2f).em,
+                                modifier = Modifier.fillMaxWidth(0.9f)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(15.dp))
+                }
+
+                item {
+                    // Header elevatedcard with one text saying "Breakdown", no time requried
+                    ElevatedCard(
+                        modifier = Modifier
+                            .height(52.dp)
+                            .fillMaxWidth(0.9f),
+                        colors = elevatedCardColors(Color(79, 86, 96, 255))
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .width((screenWidth * 0.9 * 0.45).dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Breakdown",
+                                textAlign = TextAlign.Center,
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Medium,
+                                lineHeight = (1.2f).em,
+                                modifier = Modifier.fillMaxWidth(0.9f)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(15.dp))
+                }
+
+                item {
+                    ElevatedCard(
+                        modifier = Modifier
+                            .height(70.dp)
+                            .fillMaxWidth(0.9f),
+                    ) {
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            Spacer(modifier = Modifier.width((screenWidth * 0.9 * 0.05).dp))
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .width((screenWidth * 0.9 * 0.45).dp),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "House Open",
+                                    textAlign = TextAlign.Left,
+                                    fontSize = 25.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    lineHeight = (1.2f).em,
+                                    modifier = Modifier.fillMaxWidth(0.9f)
+                                )
+                            }
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = showtimer.getTimeAsString("houseOpen"),
+                                    textAlign = TextAlign.Right,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Light,
+                                    fontFamily = incosolataFamily,
+                                    modifier = Modifier.fillMaxWidth(0.9f)
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(15.dp))
+                }
+
+                // TODO: Autogenerate rest of acts and interval with this structure
+                item {
+                    ElevatedCard(
+                        modifier = Modifier
+                            .height(179.86.dp)
+                            .fillMaxWidth(0.9f),
+                    ) {
+                        Row(modifier = Modifier.fillMaxSize()) {
+                            Spacer(modifier = Modifier.width((screenWidth * 0.9 * 0.05).dp))
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .width((screenWidth * 0.9 * 0.3).dp),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Act 1",
+                                    textAlign = TextAlign.Left,
+                                    fontSize = 25.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    lineHeight = (1.2f).em,
+                                    modifier = Modifier.fillMaxWidth(0.9f)
+                                )
+                            }
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Clearance: " + showtimer.getTimeAsString("act1Clearance"),
+                                    textAlign = TextAlign.Right,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Light,
+                                    fontFamily = incosolataFamily,
+                                    modifier = Modifier.fillMaxWidth(0.9f)
+                                )
+                                Text(
+                                    text = "Up: " + showtimer.getTimeAsString("act1Start"),
+                                    textAlign = TextAlign.Right,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Light,
+                                    fontFamily = incosolataFamily,
+                                    modifier = Modifier.fillMaxWidth(0.9f)
+                                )
+                                Text(
+                                    text = "Down: " + showtimer.getTimeAsString("act1End"),
+                                    textAlign = TextAlign.Right,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Light,
+                                    fontFamily = incosolataFamily,
+                                    modifier = Modifier.fillMaxWidth(0.9f)
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    text = "Duration: " + showtimer.duration(
+                                        "act1Start",
+                                        "act1End"
+                                    ),
+                                    textAlign = TextAlign.Right,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = incosolataFamily,
+                                    modifier = Modifier.fillMaxWidth(0.9f)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

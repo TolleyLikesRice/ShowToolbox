@@ -13,7 +13,7 @@ class Showtimer {
 
         // Don't question it, if you get rid of this, Time Elapsed and Current Time are out of sync
         // Basically it just removes the millisecond precision
-        var time: Instant = Clock.System.now();
+        var time: Instant = Clock.System.now()
         var str = time.toEpochMilliseconds().toString()
         str = "${str.substring(0, str.length - 3)}000"
         time = Instant.fromEpochMilliseconds(str.toLong())
@@ -29,6 +29,19 @@ class Showtimer {
     fun timeSince(timing: String): String {
         return if (timings.containsKey(timing)) {
             Instant.fromEpochMilliseconds(timings[timing]!!.until(Clock.System.now(), DateTimeUnit.MILLISECOND))
+                .toString().substring(11, 19)
+        } else "??:??:??"
+    }
+
+    fun getTimeAsString(timing: String): String {
+        return if (timings.containsKey(timing)) {
+            timings[timing]!!.toString().substring(11, 19)
+        } else "??:??:??"
+    }
+
+    fun duration(start: String, end: String): String {
+        return if (timings.containsKey(start) && timings.containsKey(end)) {
+            Instant.fromEpochMilliseconds(timings[start]!!.until(timings[end]!!, DateTimeUnit.MILLISECOND))
                 .toString().substring(11, 19)
         } else "??:??:??"
     }
