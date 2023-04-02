@@ -3,7 +3,9 @@ package dev.tolley.showtoolbox.android
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -14,8 +16,10 @@ import androidx.compose.material3.CardDefaults.elevatedCardColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +33,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import dev.tolley.showtoolbox.R
 import dev.tolley.showtoolbox.Showtimer
+import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.detectReorderAfterLongPress
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
+import org.burnoutcrew.reorderable.reorderable
 
 // UI Stuff
 private val incosolataFamily = FontFamily(
@@ -137,7 +145,9 @@ private fun startAct1() {
 // --- Common Components ---
 
 @Composable
-private fun SettingsBar() {
+private fun SettingsBar(
+    navigateToSettings: () -> Unit,
+) {
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -160,7 +170,9 @@ private fun SettingsBar() {
                         .fillMaxWidth()
                 )
             }
-            IconButton(onClick = { }, modifier = Modifier.height(35.dp)) {
+            IconButton(onClick = {
+                navigateToSettings()
+            }, modifier = Modifier.height(35.dp)) {
                 Icon(
                     Icons.Outlined.Settings,
                     contentDescription = "Settings",
@@ -179,6 +191,7 @@ private fun SettingsBar() {
 @Composable
 fun ShowTimerStartView(
     navigateToAct1: () -> Unit,
+    navigateToSettings: () -> Unit,
     showConfiguration: MutableMap<String, Any>
 ) {
     val currentTime by currentTime
@@ -194,7 +207,7 @@ fun ShowTimerStartView(
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
-        SettingsBar()
+        SettingsBar(navigateToSettings)
         Column(
             modifier = Modifier
                 .height(391.dp)
@@ -310,6 +323,7 @@ fun ShowTimerStartView(
 @Composable
 fun ShowTimerAct1View(
     navigateToSummary: () -> Unit,
+    navigateToSettings: () -> Unit,
     showConfiguration: MutableMap<String, Any>
 ) {
     var endText = "????"
@@ -324,7 +338,7 @@ fun ShowTimerAct1View(
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
-        SettingsBar()
+        SettingsBar(navigateToSettings)
 
         Column(
             modifier = Modifier
@@ -404,6 +418,7 @@ fun ShowTimerAct1View(
 @Composable
 fun ShowTimerSummaryView(
     //navigateToSummary: () -> Unit,
+    navigateToSettings: () -> Unit,
     showConfiguration: MutableMap<String, Any>
 ) {
 
@@ -412,7 +427,7 @@ fun ShowTimerSummaryView(
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
-        SettingsBar()
+        SettingsBar(navigateToSettings)
 
         Column(
             modifier = Modifier
@@ -640,3 +655,9 @@ fun ShowTimerSummaryView(
     }
 }
 
+@Composable
+fun ShowTimerSettingsView(
+    showConfiguration: MutableMap<String, Any>
+) {
+   
+}

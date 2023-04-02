@@ -58,14 +58,25 @@ class MainActivity : ComponentActivity() {
             composable("showtimer-start") {
                 ShowTimerStartView(
                     navigateToAct1 = { navController.navigate("showtimer-act1") },
+                    navigateToSettings = { navController.navigate("showtimer-settings") },
                     showConfiguration = showConfiguration
                 )
             }
             composable("showtimer-act1") {
-                ShowTimerAct1View(showConfiguration = showConfiguration, navigateToSummary = { navController.navigate("showtimer-summary") })
+                ShowTimerAct1View(
+                    showConfiguration = showConfiguration,
+                    navigateToSummary = { navController.navigate("showtimer-summary") },
+                    navigateToSettings = { navController.navigate("showtimer-settings") }
+                )
             }
             composable("showtimer-summary") {
-                ShowTimerSummaryView(showConfiguration = showConfiguration)
+                ShowTimerSummaryView(
+                    showConfiguration = showConfiguration,
+                    navigateToSettings = { navController.navigate("showtimer-settings") }
+                )
+            }
+            composable("showtimer-settings") {
+                ShowTimerSettingsView(showConfiguration = showConfiguration)
             }
         }
     }
